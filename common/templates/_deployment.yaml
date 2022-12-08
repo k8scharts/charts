@@ -1,14 +1,15 @@
+{{- define "common.deployment" }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "transmission.fullname" . }}
+  name: {{ include "common.fullname" . }}
   labels:
-    {{- include "transmission.labels" . | nindent 4 }}
+    {{- include "common.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
-      {{- include "transmission.selectorLabels" . | nindent 6 }}
+      {{- include "common.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -16,16 +17,17 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "transmission.selectorLabels" . | nindent 8 }}
+        {{- include "common.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "transmission.serviceAccountName" . }}
+      serviceAccountName: {{ include "common.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
+      {{- if .Values.wireguard }}
         - name: wireguard
           image: linuxserver/wireguard:latest
           imagePullPolicy: IfNotPresent
@@ -33,57 +35,39 @@ spec:
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
           env:
-            {{- toYaml .Values.env | nindent 10 }}
+            {{- toYaml .Values.env | nindent 12 }}
           volumeMounts:
           - mountPath: /config
             name: config
+      {{- end }}
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            {{- toYaml .Values.env | nindent 10 }}
+            {{- toYaml .Values.env | nindent 12 }}
           volumeMounts:
-          - mountPath: /config
-            name: config
-          - mountPath: /downloads
-            name: downloads
-          - mountPath: /watch
-            name: watch
+          {{- toYaml .Values.volumeMounts | nindent 10 }}
           ports:
-            - containerPort: {{ .Values.targetPort }}
+            - containerPort: {{ .Values.service.port }}
               protocol: TCP
           livenessProbe:
             tcpSocket:
-              port: {{ .Values.targetPort }}
+              port: {{ .Values.service.port }}
             failureThreshold: 3
             initialDelaySeconds: 10
             periodSeconds: 10
           readinessProbe:
             tcpSocket:
-              port: {{ .Values.targetPort }}
+              port: {{ .Values.service.port }}
             failureThreshold: 3
             initialDelaySeconds: 10
             periodSeconds: 10
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
-      - name: wgconfig
-        hostPath:
-          path: /data/configs/wireguard
-          type: Directory
-      - name: config
-        hostPath:
-          path: /data/configs/transmission
-          type: Directory
-      - name: downloads
-        hostPath:
-          path: /data/downloads
-          type: Directory
-      - name: watch
-        emptyDir:
-          sizeLimit: 500Mi
+      {{- toYaml .Values.volumes | nindent 6 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -96,3 +80,4 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+{{- end }}
