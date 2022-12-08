@@ -1,5 +1,5 @@
 image:
-  repository: linuxserver/transmission
+  repository: linuxserver/sonarr
   pullPolicy: IfNotPresent
   tag: "latest"
 
@@ -14,7 +14,7 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  port: 9091
+  port: 8989
 
 env:
   - name: TZ
@@ -38,7 +38,7 @@ volumeMounts:
 volumes:
 - name: config
   hostPath:
-    path: /data/configs/transmission
+    path: /data/configs/sonarr
     type: Directory
 - name: downloads
   hostPath:

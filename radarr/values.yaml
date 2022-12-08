@@ -1,5 +1,5 @@
 image:
-  repository: linuxserver/transmission
+  repository: linuxserver/radarr
   pullPolicy: IfNotPresent
   tag: "latest"
 
@@ -14,7 +14,7 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  port: 9091
+  port: 7878
 
 env:
   - name: TZ
@@ -23,30 +23,39 @@ env:
     value: "1000"
   - name: PGID
     value: "1000"
+  - name: PEERDNS
+    value: "10.96.0.10"
 
 # /config directory must be available
-wireguard: true
+wireguard: false
 
 volumeMounts:
 - mountPath: /config
   name: config
-- mountPath: /downloads
-  name: downloads
-- mountPath: /watch
-  name: watch
+- mountPath: /data
+  name: data
+- mountPath: /data2
+  name: data2
+- mountPath: /cold
+  name: cold
 
 volumes:
 - name: config
   hostPath:
-    path: /data/configs/transmission
+    path: /data/configs/radarr
     type: Directory
-- name: downloads
+- name: data
   hostPath:
-    path: /data/downloads
+    path: /data/movies
     type: Directory
-- name: watch
-  emptyDir:
-    sizeLimit: 500Mi
+- name: data2
+  hostPath:
+    path: /data2/movies
+    type: Directory
+- name: cold
+  hostPath:
+    path: /cold/movies
+    type: Directory
 
 resources: {}
 nodeSelector: {}

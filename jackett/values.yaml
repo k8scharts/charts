@@ -1,5 +1,5 @@
 image:
-  repository: linuxserver/transmission
+  repository: linuxserver/jackett
   pullPolicy: IfNotPresent
   tag: "latest"
 
@@ -14,7 +14,7 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  port: 9091
+  port: 9117
 
 env:
   - name: TZ
@@ -30,23 +30,12 @@ wireguard: true
 volumeMounts:
 - mountPath: /config
   name: config
-- mountPath: /downloads
-  name: downloads
-- mountPath: /watch
-  name: watch
 
 volumes:
 - name: config
   hostPath:
-    path: /data/configs/transmission
+    path: /data/configs/jackett
     type: Directory
-- name: downloads
-  hostPath:
-    path: /data/downloads
-    type: Directory
-- name: watch
-  emptyDir:
-    sizeLimit: 500Mi
 
 resources: {}
 nodeSelector: {}
