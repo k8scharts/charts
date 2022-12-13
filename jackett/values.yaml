@@ -1,6 +1,6 @@
 image:
   repository: linuxserver/jackett
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   tag: "latest"
 
 serviceAccount:
@@ -28,14 +28,14 @@ env:
 wireguard: true
 
 volumeMounts:
-- mountPath: /config
-  name: config
+  - mountPath: /config
+    name: config
 
 volumes:
-- name: config
-  hostPath:
-    path: /data/configs/jackett
-    type: Directory
+  - name: config
+    hostPath:
+      path: /data/configs/jackett
+      type: Directory
 
 resources: {}
 nodeSelector: {}

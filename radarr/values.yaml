@@ -32,6 +32,8 @@ wireguard: false
 volumeMounts:
 - mountPath: /config
   name: config
+- mountPath: /downloads
+  name: downloads
 - mountPath: /data
   name: data
 - mountPath: /data2
@@ -43,6 +45,10 @@ volumes:
 - name: config
   hostPath:
     path: /data/configs/radarr
+    type: Directory
+- name: downloads
+  hostPath:
+    path: /data/downloads
     type: Directory
 - name: data
   hostPath:

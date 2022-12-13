@@ -25,15 +25,19 @@ env:
     value: "1000"
 
 # /config directory must be available
-wireguard: true
+wireguard: false
 
 volumeMounts:
 - mountPath: /config
   name: config
 - mountPath: /downloads
   name: downloads
-- mountPath: /watch
-  name: watch
+- mountPath: /data
+  name: data
+- mountPath: /data2
+  name: data2
+- mountPath: /cold
+  name: cold
 
 volumes:
 - name: config
@@ -44,9 +48,18 @@ volumes:
   hostPath:
     path: /data/downloads
     type: Directory
-- name: watch
-  emptyDir:
-    sizeLimit: 500Mi
+- name: data
+  hostPath:
+    path: /data/tv
+    type: Directory
+- name: data2
+  hostPath:
+    path: /data2/tv
+    type: Directory
+- name: cold
+  hostPath:
+    path: /cold/tv
+    type: Directory
 
 resources: {}
 nodeSelector: {}
