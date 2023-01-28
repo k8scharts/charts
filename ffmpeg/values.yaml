@@ -1,0 +1,25 @@
+image:
+  repository: linuxserver/ffmpeg
+  pullPolicy: IfNotPresent
+  tag: "5.1.2"
+
+# at 08:00 AM on Mon,Tue,Wed,Thu,Fri
+# schedule: "0 8 * * 1,2,3,4,5"
+
+# 8 am EST is 1 pm UTC on same day
+# "0 13 * * 1,2,3,4,5"
+
+schedule: "10 17 10 * *"
+duration: "1:00:00"
+url: ""
+outPath: "/data"
+
+volumeMounts:
+  - mountPath: /data
+    name: data
+
+volumes:
+  - name: data
+    hostPath:
+      path: /data/tv/Dogtopia
+      type: Directory

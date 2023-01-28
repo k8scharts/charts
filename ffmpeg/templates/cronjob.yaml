@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "ffmpeg.fullname" . }}
+  labels:
+    {{- include "ffmpeg.labels" . | nindent 4 }}
+spec:
+  schedule: "{{ .Values.schedule }}"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: {{ .Chart.Name }}
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              command:
+                - "ffmpeg"
+                - "-i"
+                - "{{ .Values.url }}"
+                - "-t"
+                - "{{ .Values.duration }}"
+                - "-bsf:a"
+                - "aac_adtstoasc"
+                - "-vcodec"
+                - "copy"
+                - "-c" 
+                - "copy" 
+                - "-crf"
+                - "0" 
+                - "{{ .Values.outPath }}/{{ now | date "2006-01-02" }}-test-{{ randAlphaNum 6 }}.mp4"
+              volumeMounts:
+              {{- toYaml .Values.volumeMounts | nindent 14 }}
+          restartPolicy: OnFailure
+          volumes:
+          {{- toYaml .Values.volumes | nindent 10 }}
